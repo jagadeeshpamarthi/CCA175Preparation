@@ -1,0 +1,56 @@
+class Order(orderId: Int,name:String){         // In scala class is defined directly with constructor and argument parameters)
+  println("inside constructor")
+  override def toString("Order("+orderId+","+name)     // override declaration ,def  method defining 
+  }
+
+scala>val order = new Order(1,"jag")
+output : inside constructor
+         Order(1,Jag)
+
+to access arrguments with objects we need to declar them with "val or var"
+val : class Order(val orderId: Int,val name:String){          //generate getter method means can call values with object
+scala>val order = new Order(1,"jag")
+scala>order.orderId   
+output: 1
+var : class Order(var orderId: Int,var name:String){          //generate getter and setter method means can call values with object
+order.orderId=2                       //value will be changed to 2 as var is mutable 
+
+
+singleton class / main method :
+scala>Object Demo{
+   def main(args: Array[String]):Unit={
+   println("inside standalone class")
+   }
+   }
+output:   
+scala>Demo.main(Array(" "))
+inside singletone class
+
+companion object :                           
+class Order(orderId: Int,name:String){       
+  println("inside constructor")
+  override def toString("Order("+orderId+","+name) 
+  }
+  object Order{
+  def apply(orderId:Int,name:String):Order={
+  new Order(orderId,name)
+  }
+  }
+
+scala>val demo=Order.apply(1,"jagg")
+
+
+case class :
+case class implements product n serilizeble and by default arguments are (val)mutable . 
+ex:
+case class Order(orderId: Int,name:String){       
+  println("inside constructor")
+  }
+test:
+scala>val order = Order(2,"jag")          //no need of (companion object) apply method.
+order.    has many overriden methods from product n serilizable
+like :
+productArity(num of arguments)
+productElement,productItretor,productPrefix,toString,etc
+
+
