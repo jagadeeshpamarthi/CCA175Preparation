@@ -5,7 +5,10 @@ In Scala Collections are catagerized into 3 types
 
 above three are Interfaces and has their own concreat class , parent of all these interfaces is iterator,its parent is travesable 
 
-
+Tupels :
+val tupel = (1,2,4.1,5)       //dataset which implements product and serializeble and to we need to access the elements with there location only
+scala>tupel._3
+output : 4.1
 
 
 
