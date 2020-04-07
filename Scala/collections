@@ -1,0 +1,11 @@
+In Scala Collections are catagerized into 3 types 
+1 seq                         //all sequential datasets come under seq(Array,List etc) allows duplicates
+2 set                         //NO duplicates (set)
+3 Map                         // key value pair data sets come under this (Map)
+
+above three are Interfaces and has their own concreat class , parent of all these interfaces is iterator,its parent is travesable 
+
+
+
+
+
