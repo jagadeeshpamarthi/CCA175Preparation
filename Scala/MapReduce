@@ -1,0 +1,18 @@
+Basic MapReduce operations:
+Map
+Filter
+Reduce
+
+
+excercise :  to find sum of squares of even number in 1 to 100
+steps
+1 Filter (divide even num from list of 100 num)
+2 Map     (Square each num of Filtered values)
+3 Reduce   (Sum all squared map values)
+
+val l = (1 to 100).toList
+val f = l.filter(ele => ele%2 ==0)       //Syntax def filter(func=> boolean):List[Int]
+                                        //takes integer value as arg because 'l' is int list , returns list of int values which are even
+val m = f.map(value => value * value)   //syntax def map[B] map(function:Int => B):scala.collectionTraversableOne[B]                                         
+                                        //takes int as input return int as output as f is Int values
+val r = m.reduce((total,element)=>total+element)    // def reduce((A1,A1)=>A1):A1                                     
