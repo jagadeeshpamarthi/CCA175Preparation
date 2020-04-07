@@ -1,0 +1,17 @@
+Three steps :
+1 Develop application
+2 Build a JAR file
+3 Run as a JAR file
+
+import scala.io.Source
+
+objet MaleYoBSum
+{
+def main(args: Array[String]){
+val data = Source("Downloads/names/yob1881.txt").getLines        
+
+val dataFilter = data.filter(dataCont => dataCont.split(",")(1).equal("M"))    
+val dataMap = dataFilter.map(_.split(",")(2))                                 
+val dataReduce = dataMap.reduce(_+_)                                           
+}
+}
