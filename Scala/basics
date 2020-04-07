@@ -1,0 +1,69 @@
+scala>    has two types of variable declaration :
+1. val   (immutable   cant change if once declared )
+2. var   (mutable)
+
+ex :  val i = 0
+       i = 2    // error
+       var j= 5 
+       j= 7    // no issue
+       j ="string"   // error  data type mismatch 
+       
+      
+paste mode :
+      to execute series of lines at a time use 
+      scala> :paste
+      // Entering paste mode (ctrl-D to finish)
+      var total = 0
+      for(element <- (1 to 100))
+      total += element
+      
+      ctrl+D
+      
+     total Int: 5050
+     
+Funtions :
+syntax to create function is 
+"def"
+scala> :paste
+      // Entering paste mode (ctrl-D to finish)
+def sum(lb:Int, ub:Int):Int={               //def = defining function , sum function name , lb ub parameters with datatype mandatory, "="mandatory var total = 0 , Int return type given(optional)
+for (element <- lb to ub){
+total += element
+}
+total                                       //return value (Int)
+}
+ctrl D
+sum : sum(lb:Int.ub:Int)Int
+Test : scala>sum(1,10)
+res8 : Int =55
+
+
+Higher order function : 
+passing function as a argument is know as higher order function
+syntax :
+def testFun(functionD:Int => Int,lb:Int,ub:Int):Int={
+var total =0
+for(element <- lb to ub){
+total += functionD(element)
+}
+total
+}
+ctrl+D
+
+new function:
+def sqr(i:Int)=i*i             //similarly cube , double etc
+
+scala>testFun(sqr,1,10)
+385      
+
+anonymous function : 
+instead of calling other function , we can directly implement our own logic while we request as below
+scala>testFun(i => {
+                   if(i%2 == 0) i*i
+                   else i * 2
+                   },1,10 )                         //1st parameter is our own logic , 2 nd 3rd are normal
+
+
+
+
+
