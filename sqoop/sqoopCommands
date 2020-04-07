@@ -1,0 +1,52 @@
+The command for importing table is:
+sqoop import --connect jdbc:mysql://localhost/employees --username edureka --table employees
+
+
+You can also import the table in a specific directory in HDFS using the below command:
+sqoop import --connect jdbc:mysql://localhost/employees --username edureka --table employees --m 1 --target-dir /employees
+
+
+Sqoop – IMPORT Command with Where Clause
+sqoop import --connect jdbc:mysql://localhost/employees --username edureka --table employees --m 3 --where "emp_no > 49000" --target-dir /Latest_Employees
+
+
+Sqoop – Incremental Import
+Sqoop provides an incremental import mode which can be used to retrieve only rows newer than some previously-imported set of rows. Sqoop supports two types of incremental imports: append and lastmodified. You can use the –incremental argument to specify the type of incremental import to perform.
+Sqoop imports rows where the check column has a value greater than the one specified with –last-value
+sqoop import --connect jdbc:mysql://localhost/employees --username edureka --table employees --target-dir /Latest_Employees --incremental append --check-column emp_no --last-value 499999
+
+
+Sqoop – Import All Tables
+sqoop import-all-tables --connect jdbc:mysql://localhost/employees --username edureka    
+
+
+
+sqoop list-databases
+sqoop list-databases --connect jdbc:mysql://localhost/ --username edurekaSqoop – List Databases    
+
+
+Sqoop – List Tables
+sqoop list-tables --connect jdbc:mysql://localhost/employees --username edureka
+
+
+Sqoop – Export
+sqoop export --connect jdbc:mysql://localhost/employees --username edureka --table emp --export-dir /user/edureka/employees
+
+
+Sqoop – Codegen
+In object-oriented application, every database table has one Data Access Object class that contains ‘getter’ and ‘setter’ methods to initialize objects. Codegen generates the DAO class automatically. It generates DAO class in Java, based on the Table Schema structure.
+The command for generating java code is:
+sqoop codegen --connect jdbc:mysql://localhost/employees --username edureka --table employees    
+
+
+sqoop - hive import
+sqoop import --connect jdbc:mysql://cxln2.c.thelab-240901.internal/sqoopex --table widgets -m 2 --hive-import --username sqoopuser -P --hive-database sqoop_testing --split-by id
+
+
+sqoop - HBase import : 
+sqoop import --connect jdbc:mysql://10.142.1.2/sqoopex --table widgets --hbase-table 'sgiri:widgets' --column-family cf2 --username sqoopuser --hbase-create-table --columns id,widget_name --hbase-row-key id -m 1 --password NHkkP876rp
+
+
+Sqoop Export - Hive To MySQL
+sqoop export --connect jdbc:mysql://ip-172-31-20-247/sqoopex -m 1 --table sales_sgiri --export-dir /apps/hive/warehouse/sg.db/sales_test --input-fields-terminated-by ',' --username sqoopuser --password NHkkP876rp
+
