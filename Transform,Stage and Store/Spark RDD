@@ -1,0 +1,18 @@
+RDD : 
+Resilient
+Distributed
+DataSet
+
+RDD is extension of scala List data set , difference b/w both is RDD is :
+1  in-memory
+2  Distributed
+3  DataSet
+
+creating RDD :
+val scalaList = (1 to 100).toList
+val scalaRDD = sc.parallelize(scalaList)             // .parallelize function converts a list into RDD
+
+RDD is falut-tolarent,high availability as it is resilient(RDD process stroed in multiple executors)
+RDD is stored in Distributed manner
+
+
