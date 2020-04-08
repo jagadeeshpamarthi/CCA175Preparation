@@ -1,0 +1,60 @@
+Standard Transformations :
+ String manipulations
+ Row level Transformations
+ Filtering (Horizontal,vertical)
+ Joins
+ Aggregations
+ sorting
+ Ranking
+ set operations
+
+Transformation API differentiation : 
+  map,flatMap,mapPartition,
+  mapPartitionWithIndex     -> Row Level Transformation
+  filter                    -> to Filter
+  reduceBy,aggregateBy      -> aggregation
+  union,intersection,distinct -> set operations
+  groupBy                     ->Ranking
+  joins                       ->joins
+  sortBy                      -> sorting
+  
+  
+  
+
+1 String Manipulations : 
+    similar to java string functions
+    val str = "hello how r u"
+    str.substring(0,10)            //sub string
+    str.contains("hello")         //boolean
+    str.length
+    if(str == "hello how r u")
+    str.split(",")                  imp
+    etc
+    
+2  Row level Transformations
+    Map:-
+    (fun : T => U):map[U]
+    takes one argument and returns single value RDD as output
+    flatMap :- similar to map , but it will return one or more values as output
+    ex:
+    val str = List("hello","this is word count","to count word")
+    val strRDD = sc.parallelize(str)
+    val strFlatMap = strRDD.flatMap(str => str.split(" "))
+    val strMap = strFlatMap.map(word => (word,"")).countByKey
+    
+3 Flitering (horzontal)
+    filter API is used for horizontal transformation
+    map is used for vertical(Row)
+    
+4 Joins :
+    
+    
+
+
+
+
+
+
+
+
+    
