@@ -1,0 +1,23 @@
+Loading data into spark from HDFS :
+val txtFile = sc.textFile("/path in hdfs")
+                                                  //RDD is of [String] as it is textFile and each row is record 
+txtFile.take(10).foreach(println)                 //prints 1st 10 records 
+txtFile.first                                     //gives 1st record
+
+load a local textFile into spark RDD
+steps:
+scala ,local file import 
+convert the val into list
+parallelize the list
+
+val localfile =  scala.io.Source.fromFile("/localPath").getLines.toList
+val fileRDD = sc.parallelize(loaclfile)
+
+
+
+
+
+
+
+
+
