@@ -1,0 +1,25 @@
+Read data from different file formates : 
+1  Data Frames (Distributed collection with structure)
+2  API provided sqlContext 
+3  Supported file formates :
+      orc
+      json
+      Praquet
+      avro
+4  Previewing the data
+    show
+
+Data Frames = RDD + structure(json,orc etc)
+sqlContext is loaded along with sc when spark is loaded
+with the help of sqlContext we can read diff file formats
+val jsonDF = sqlContext.load("path",source(json,orc...))
+val jDF = sqlContext.read.json("path")
+scala> jDF.show
+prints the output of read file in table formate with columns names are arranged in ascending order
+
+other API's : 
+scala>jDF.printSchema       //prints detials of table(describe table)
+scala>jDF.select(column 1,c 2)    //query 
+
+
+
