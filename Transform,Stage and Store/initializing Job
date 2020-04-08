@@ -1,0 +1,36 @@
+To Run spark using scala the command is below :
+spark-shell                                           //runs in local machine
+
+using python :
+pyspark
+
+To run spark on CLUSTER :
+spark-shell --master yarn                  //where yarn is resource manager like(ec2, apache mesos)
+To run spark on CLUSTER on LABS :
+spark-shell --master yarn --conf spark.ui.port=12344               //where yarn is resource manager like(ec2, apache mesos)
+
+By giving the above command the spark will be started with 2 implicite variables sc and sqlcontext
+spark-shell = spark dependencies + scala + implicite variables sc n sqlContect
+
+sc : 
+sparkContext , a webservice provided by spark running on port given
+
+scala> sc.getConf.getAll.foreach(println)            //gives all the details regarding spark instance we created
+--num-executors                                     //number of executors to run spark jobs     (default executors are 2)
+--executors-memory                                    //memory allocation for executors
+
+we can modify the above 2 values as below :
+--num-executors 3
+--executors-memory 512M
+
+2 imp property files of Spark :
+spark-defaulf.conf                        //basic details regarding yarn ,history etc
+sprak-env.sh                              //all details regarding executors ,mem etc
+
+
+Initialize Programatically sc and conf values :
+sc.stop                                //stops instance of sc created
+import org.apache.spark.{SparkConf,SparkContext}
+val conf = new SparkConf().setAppName("Name").SetMaster(yarn-client)
+val sc = new SparkContext(conf)
+
