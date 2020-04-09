@@ -47,14 +47,106 @@ Transformation API differentiation :
     map is used for vertical(Row)
     
 4 Joins :
-    
-    
-
-
-
-
-
-
+    > join(otherDataset, [numTasks]) ->	When called on datasets of type (K, V) and (K, W), returns a dataset of (K, (V, W)) pairs with
+    all pairs of elements for each key. Outer joins are supported through leftOuterJoin, rightOuterJoin, and fullOuterJoin.
+    > In order to perform joins the data sets must be pairredRDDs(tupels) and the key value of both data sets should be matching
+    >ex :
+    joining order and order_items :
+      val orders = sc.textFile("path")
+      val order_items = sc.textFile("path")
+      val orderMap = orders.map(order => (order.split(",")(0).toInt,order.split(",")(1).substring(0,10))
+      val orderItemsMap = order_items.map(order => (order.split(",")(1).toInt,order.split(",")(3))
+      val orderJoin = orderMap.join(orderItemsMap)                                                       //Inner join  (output contains only if record matches)
+      
+      outerJoins :
+      ex : get all orders which do not have corresponding entries in order_items table
+      val orders = sc.textFile("path")
+      val order_items = sc.textFile("path")
+      val orderMap = orders.map(order => (order.split(",")(0).toInt,order)
+      val orderItemsMap = order_items.map(order => (order.split(",")(1).toInt,order)
+      val orderLeftOuterJoin = orderMap.leftOuterJoin(orderItemsMap)                                 //leftOuter join  (output contains only if record matches)
+      orderLeftOuterJoin.take(10).foreach(println)
+      (1,(1,2013-09,complete,some(1,1,299))
+      (2,(2,2013-09,complete,some(1,2,4299))
+      (3,(3,2013-09,complete,some(1,3,2299))      
+      (4,(4,2013-09,complete,None)
+      (5,(5,2013-09,complete,None)      
+      5 more records...
+      from the above data set we need only the records which are None
+      val noneValues = orderLeftOuterJoin.filter(noneV => {
+                                                noneV._2._2 == "None" 
+                                                })
+      val finalOrders = noneValues.map(orders => orders._2._1)
+      final output is finalOrders.
+      rightOuterJoin is same as leftOuterJoin only difference is placing dataset
+      val orderRightOuterJoin = orderItemsMap.rightOuterJoin(orderMap)                                 //rightOuter join  (output contains only if record matches)
+      full outer joins is used in many to many condition
+  
+5 Aggregations :
+   a cluster of things that have come or been brought together.(sum,min,max ,avg)
+   API's those are used for Aggregations are
+   Transformation API's : 
+     groupByKey
+     reduceByKey
+     aggregateByKey
+   Action API's :                        //global aggregation
+      reduce
+      countByKey
+      
+  Excercise : 
+     Action API's
+       reduce :
+           val actionReduce = orders.reduce(total , reduce => total+reduce)
+       countByKey:
+           val actionCountByKey = orders.map(order => (order.split(",")(3),"")).countByKey.foreach(println)
+      
+     Transformation API's :
+           In order to understand aggregations of Transformation API's we need to understand combainer 1st
+              Combainer :
+                  combainer is utilizing the resources more efficiently(divide n calculate)
+                  GroupByKey : 
+                      this API is not suggeseted for aggregation functions like sum ,avg ,max ect (reduceBykey,aggregateByKey suggested)
+                      because it dosn't use combainer logic
+                  ReduceByKey  :
+                      it follows combainer logic , but the logic for intermidate and final combination is same
+                      the above case won't work is some situations like :- avg
+                      internal partition
+                  aggregateByKey  :
+                      combianer logic
+                      different logic for intermidate and final result
+                  example :
+                     val sumGroupByKey = sum(1 to 1000) => 1+2+3+ .....+1000
+                     val sumReduceByKey = sum(1 to 1000) => (sum(1, 250),sum(251,500),sum(501,750),sum(451,1000))  //combainer
+             groupByKey([numTasks]) 	When called on a dataset of (K, V) pairs, returns a dataset of (K, Iterable<V>) pairs.
+                                     Note: If you are grouping in order to perform an aggregation (such as a sum or average) 
+                                     over each key, using reduceByKey or aggregateByKey will yield much better performance.
+                                     Note: By default, the level of parallelism in the output depends on the number of partitions 
+                                     of the parent RDD. You can pass an optional numTasks argument to set a different number of tasks.
+             reduceByKey(func, [numTasks]) 	When called on a dataset of (K, V) pairs, returns a dataset of (K, V) pairs where 
+                                           the values for each key are aggregated using the given reduce function func, which
+                                           must be of type (V,V) => V. Like in groupByKey, the number of reduce tasks is configurable 
+                                           through an optional second argument.
+             aggregateByKey(zeroValue)(seqOp, combOp, [numTasks]) 	When called on a dataset of (K, V) pairs, returns a dataset of 
+                                                              (K, U) pairs where the values for each key are aggregated using the given 
+                                                              combine functions and a neutral "zero" value. Allows an aggregated value 
+                                                              type that is different than the input value type, while avoiding unnecessary 
+                                                              allocations. Like in groupByKey, the number of reduce tasks is configurable through an optional second argument.
+       ex:
+        groupByKey : 
+          val orderitemsMap = order_items.map(o => (o.split(",")(1).toInt, o.split(",")(4).toFloat)
+          val oiMBK = orderitemsMap.groupByKey                                         //No function,requirs pairred RDD as input
+          scala> oiMBK.take(10).foreach(println)
+              (1,comp...[199,299,33.9]
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
 
 
     
