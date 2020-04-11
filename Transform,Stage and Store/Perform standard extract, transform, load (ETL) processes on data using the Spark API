@@ -138,9 +138,72 @@ Transformation API differentiation :
           scala> oiMBK.take(10).foreach(println)
               (1,comp...[199,299,33.9]
           
-          
-          
-          
+        //aggregation - reduceByKey : 
+          val order_items = sc.textFile("/user/jagadeeshpamarthi35410/retail_db1/order_items/")
+          //get orderitems_id as key and revenue as value , so that we can perform reduceByKey operation to calculate the revenue for particular orderId
+          val orderitemMap = order_items.map(order => (order.split(",")(1).toInt,order.split(",")(4).toFloat))
+          val orderitemRevenueTotal = orderitemMap.reduceByKey(_+_)
+          orderitemRevenueTotal.take(10).foreach(println)
+          // TO get minimum value of orderId
+          val orderitemRevenueMin = orderitemMap.reduceByKey((min,revenue) => if(min>revenue) revenue else min)
+
+       //aggregation - aggregateByKey
+          val order_items = sc.textFile("/user/jagadeeshpamarthi35410/retail_db1/order_items/")
+          //get orderitems_id as key and revenue as value , so that we can perform aggregateByKey operation to calculate the revenue & min value for  orderId
+          val orderitemMap = order_items.map(order => (order.split(",")(1).toInt,order.split(",")(4).toFloat))
+          //output : (456,2999.99)
+         //         (345,277.98) ...			
+         //aggregateByKey syntax. aggregateByKey(initialValues and also desired output format)(2 funtions ,one is for intermediate n 2 is for final)
+         val orderitemRevenueTotal = orderitemMap.aggregateByKey((0.0f,0.0f))(  
+        //1st function,performed on each partion(node) with intial zero values and key's VALUE as input,returns output which is tuple(sum,max)                
+        (initialTuple,revenue) => (initialTuple._1+revenue,if(initialTuple._2>revenue)initialTuple._2 else revenue),
+        // 2nd funtion ,combainer function performed on cluster level taking input as outputs of each node and performing final out put on it
+        (nodeN,nodeNplus1) => (nodeN._1+nodeNplus1._1,if(nodeN._2>nodeNplus1._2)nodeN._2 else nodeNplus1._2)
+         )
+        orderitemRevenueTotal.take(10).foreach(println)
+        
+      //Sorting - sortByKey
+        val product = sc.textFile("/user/jagadeeshpamarthi35410/retail_db1/product/")
+        //get productsId & subtotal as Compositekey and product as value , so that we can perform sortByKey operation to sort it with product acsending & //-subtotal decending
+        val productMap = product.
+                filter(product => product.split(",")(4) != "").
+                map(product => ((product.split(",")(1).toInt, -product.split(",")(4).toFloat),product)).
+                sortByKey()
+         //getting only sorted values leaving unnececcary values apart
+         val sortedProducts = productMap.map(product => product._2)
+         
+      //Ranking  takeOrdered
+         val product = sc.textFile("/user/jagadeeshpamarthi35410/retail_db1/product/")
+         //simple way to get top N products with price in decending order using takeOrdered ACTION 
+         val productMap = product.
+                filter(product => product.split(",")(4) != "").
+                takeOrdered(10)(Ordering[Float].reverse.on(product => product.split(",")(4).toFloat)).foreach(println)
+   
+ Excercise 1 :   
+  //Ranking -Get top N priced products with in each product category
+    val product = sc.textFile("/user/jagadeeshpamarthi35410/retail_db1/product/")
+    val productMap = product.
+                filter(product => product.split(",")(4) != "").
+                map(product => (product.split(",")(1).toInt, product))
+    val productsGBK = productMap.groupByKey
+    //productsGBK: org.apache.spark.rdd.RDD[(Int, Iterable[String])] = ShuffledRDD[18] at groupByKey at <console>:28
+    //output:
+    //-(30,CompactBuffer(645,30,Roxy Women's Steamer Long Sleeve Rash Guard,,68.0,http://images.acmesports.sports/    //-Roxy+Women%27s+Steamer+Long+Sleeve+Rash+Guard, 646,30,Merrell Women's Grassbow Sport Hiking Shoe,,99.99,http://images.acmesports.sports/   //-Merrell+Women%27s+Grassbow+Sport+Hiking+Shoe, 647,30,Merrell Women's Siren Mid Waterproof Hiking B,,134.99,http://images.acmesports.sports/      //-Merrell+Women%27s+Siren+Mid+Waterproof+Hiking+Boot, ...))
+    val productsGBKFirstIterable = productsGBK.first._2
+
+    def topNPricedProducts(productIterable:Iterable[String],topN:Int):Iterable[String] = {
+        val productsSorted = productIterable.toList.sortBy(product => -product.split(",")(4).toFloat)
+        val topNPricesSet = productIterable.map(product=>product.split(",")(4).toFloat).toSet
+        val topNPrices = topNPricesSet.toList.sortBy(p => -p).take(topN)
+        val topNpriceMin = topNPrices.min
+        val finalSortedProducts = productsSorted.takeWhile(product => product.split(",")(4).toFloat >= topNpriceMin)
+        finalSortedProducts
+    }
+    val finalResultProducts = productsGBK.map(product => topNPricedProducts(product._2,1))
+
+Set Operations : 
+      
+
           
           
           
