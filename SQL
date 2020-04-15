@@ -1,0 +1,816 @@
+DML :(Data Manipulation Language)
+  MySQL Data Manipulation
+
+    SELECT
+    ORDER BY
+    WHERE
+    SELECT DISTINCT
+    AND
+    OR
+    IN
+    BETWEEN
+    LIKE
+    LIMIT
+    IS NULL
+    Table & Column Aliases
+    Joins
+    INNER JOIN
+    LEFT JOIN
+    RIGHT JOIN
+    Self Join
+    CROSS JOIN
+    GROUP BY
+    HAVING
+    ROLLUP
+    Subquery
+    Derived Tables
+    EXISTS
+    UNION
+    MINUS
+    INTERSECT
+    INSERT
+    Insert Multiple Rows
+    INSERT INTO SELECT
+    Insert On Duplicate Key Update
+    INSERT IGNORE
+    UPDATE
+    UPDATE JOIN
+    DELETE
+    DELETE JOIN
+    ON DELETE CASCADE
+    REPLACE
+ ==============================================================================================================================
+MySQL Data Definition Language :-
+
+    Selecting Database
+    CREATE DATABASE
+    DROP DATABASE
+    Managing Databases
+    Storage Engines
+    Data Types
+    CREATE TABLE
+    Primary Key
+    Foreign Key
+    UNIQUE Constraint
+    CHECK Constraint
+    NOT NULL
+    Sequence
+    ALTER TABLE
+    ADD COLUMN
+    DROP COLUMN
+    RENAME TABLE
+    DROP TABLE
+    Temporary Tables
+    TRUNCATE TABLE
+==============================================================================================================================
+DML :
+ select = select * from tableName;
+ ==============================================================================================================================
+ order By :
+   When you use the SELECT statement to query data from a table, the result set is not sorted. It means that the rows in the result set can be in any order.
+
+  To sort the result set, you add the ORDER BY clause to the SELECT statement. The following illustrates the syntax of the ORDER BY  clause:
+
+  SELECT 
+   select_list
+  FROM 
+   table_name
+  ORDER BY 
+   column1 [ASC|DESC], 
+   column2 [ASC|DESC],
+   ...;
+  2.Suppose that you want to sort the sales orders based on their statuses in the following order:
+
+    In Process
+    On Hold
+    Canceled
+    Resolved
+    Disputed
+    Shipped
+
+  To do this, you can use the FIELD() function to map each order status to a number and sort the result by the result of the FIELD() function:
+
+  SELECT 
+    orderNumber, 
+    status
+  FROM
+    orders
+  ORDER BY 
+    FIELD(status,
+        'In Process',
+        'On Hold',
+        'Cancelled',
+        'Resolved',
+        'Disputed',
+        'Shipped');
+==============================================================================================================================  
+Where clause :
+   The WHERE clause allows you to specify a search condition for the rows returned by a query. The following shows the syntax of the WHERE clause:
+
+SELECT 
+    select_list
+FROM
+    table_name
+WHERE
+    search_condition;
+    
+The search_condition is a combination of one or more predicates using the logical operator AND, OR and NOT.
+
+In MySQL, a predicate is a Boolean expression that evaluates to TRUE, FALSE, or UNKNOWN.
+
+Any row from the table_name that causes the search_condition to evaluate to TRUE will be included in the final result set.
+
+Besides the SELECT statement, you can use the WHERE clause in the UPDATE or DELETE statement to specify which rows to update or delete.
+order :
+ FROM  --> "WHERE"  --> SELECT  --> ORDER BY
+ 
+ SELECT 
+    lastname, 
+    firstname, 
+    jobtitle,
+    officeCode
+ FROM
+    employees
+ WHERE
+    jobtitle = 'Sales Rep' AND 
+    officeCode = 1;                     //if both TRUE then will send that record to result set
+ 
+ SELECT 
+    lastName, 
+    firstName, 
+    jobTitle, 
+    officeCode
+ FROM
+    employees
+ WHERE
+    jobtitle = 'Sales Rep' OR                  //any one condition TURE ,enough to add that record  into result set
+    officeCode = 1
+ ORDER BY 
+    officeCode , 
+    jobTitle;                           
+  
+ WHERE
+    officeCode BETWEEN 1 AND 3         //1 to 3
+ 
+WHERE
+    lastName LIKE '%son'              // any num of characters infront of 'son' ex : peterson
+
+WHERE
+    officeCode IN (1 , 2, 5)          //in 1,2,5 only
+ 
+WHERE
+    reportsTo IS NULL;               // IS NULL
+  
+Using MySQL WHERE clause with comparison operators
+
+The following table shows the comparison operators that you can use to form the expression in the WHERE clause.
+Operator	Description
+=	Equal to. You can use it with almost any data types.
+<> or !=	Not equal to
+<	Less than. You typically use it with numeric and date/time data types.
+>	Greater than.
+<=	Less than or equal to
+>=	Greater than or equal to
+
+WHERE
+    jobtitle <> 'Sales Rep';         // similarlt <,<=,>=,>,=
+==============================================================================================================================  
+MySQL DISTINCT clause :
+  When querying data from a table, you may get duplicate rows. In order to remove these duplicate rows, you use the DISTINCT clause in the SELECT statement.
+
+Here is the syntax of the DISTINCT clause:
+
+SELECT DISTINCT
+    select_list
+FROM
+    table_name;
+ 
+DISTINCT clause vs. GROUP BY clause
+
+If you use the GROUP BY clause in the SELECT statement without using aggregate functions, the GROUP BY clause behaves like the DISTINCT clause.
+
+The following statement uses the GROUP BY clause to select the unique states of customers from the customers table.
+
+SELECT 
+    state
+FROM
+    customers
+GROUP BY state;
+
+Generally speaking, the DISTINCT clause is a special case of the GROUP BY clause. The difference between DISTINCT clause and GROUP BY clause 
+is that the GROUP BY clause sorts the result set whereas the DISTINCT clause does not.
+
+MySQL DISTINCT and aggregate functions
+
+You can use the DISTINCT clause with an aggregate function e.g., SUM, AVG, and COUNT, to remove duplicate rows before the aggregate functions are applied to the result set.
+
+For example, to count the unique states of customers in the U.S., you use the following query:
+
+SELECT 
+    COUNT(DISTINCT state)
+FROM
+    customers
+WHERE
+    country = 'USA';
+OUTPUT : 8
+
+MySQL DISTINCT with LIMIT clause
+
+In case you use the DISTINCT clause with the LIMIT clause, MySQL immediately stops searching when it finds the number of unique rows specified in the LIMIT clause.
+
+The following query selects the first five non-null unique states in the customers table.
+
+SELECT DISTINCT
+    state
+FROM
+    customers
+WHERE
+    state IS NOT NULL
+LIMIT 5;
+==============================================================================================================================  
+Using MySQL IN with a subquery :
+
+The IN operator is often used with a subquery. Instead of providing a list of literal values, the subquery gets a list of values from one or more tables and uses them as the input values of the IN operator.
+Let’s take a look at the orders and orderDetails tables from the sample database:
+orders orderdetails table
+For example, if you want to find the orders whose total values are greater than 60,000, you use the IN operator as shown in the following query:
+
+SELECT    
+	orderNumber, 
+	customerNumber, 
+	status, 
+	shippedDate
+FROM    
+	orders
+WHERE orderNumber IN
+(
+	 SELECT 
+		 orderNumber
+	 FROM 
+		 orderDetails
+	 GROUP BY 
+		 orderNumber
+	 HAVING SUM(quantityOrdered * priceEach) > 60000
+);
+==============================================================================================================================  
+2) Using MySQL BETWEEN with dates example
+
+When you use the BETWEEN operator with date values, to get the best result, you should use the type cast to explicitly convert the type of column or expression to the DATE type.
+
+The following example returns the orders which have the required dates between 01/01/2003 to 01/31/2003:
+
+SELECT 
+   orderNumber,
+   requiredDate,
+   status
+FROM 
+   orders
+WHERE 
+   requireddate BETWEEN 
+     CAST('2003-01-01' AS DATE) AND 
+     CAST('2003-01-31' AS DATE);
+==============================================================================================================================  
+MySQL LIKE operator with ESCAPE clause
+
+Sometimes the pattern, which you want to match, contains wildcard character e.g., 10%, _20, etc. In this case, you can use the ESCAPE clause to specify the escape character so that MySQL will interpret the wildcard character as a literal character. If you don’t specify the escape character explicitly, the backslash character \ is the default escape character.
+
+For example, if you want to find products whose product codes contain the string _20 , you can use the pattern %\_20% as shown in the following query:
+
+SELECT 
+    productCode, 
+    productName
+FROM
+    products
+WHERE
+    productCode LIKE '%\_20%';
+
+
+
+Or you can specify a different escape character e.g., $ by using the ESCAPE clause:
+
+SELECT 
+    productCode, 
+    productName
+FROM
+    products
+WHERE
+    productCode LIKE '%$_20%' ESCAPE '$';
+==============================================================================================================================  
+LIMIT and ORDER BY clauses
+
+The SELECT statement without an ORDER BY clause returns rows in an unspecified order. It means that rows can be in any order. When you apply the LIMIT clause to this unordered result set,  you will not know which rows the query will return.
+
+For example, you may want to get fifth through tenth rows, but fifth through tenth in what order? The order of rows is unknown unless you specify the ORDER BY clause.
+
+Therefore, it is a good practice to always use the LIMIT clause with the ORDER BY clause to constraint the result rows in unique order.
+
+SELECT select_list
+FROM table_name
+ORDER BY order_expression
+LIMIT offset, row_count;
+
+The following picture illustrates the evaluation order of the LIMIT clause in the SELECT statement:
+
+FROM  --> WHERE  --> SELECT  --> ORDER BY  --> "LIMIT"
+
+3) Using MySQL LIMIT to get the nth highest or lowest value
+
+To get the nth highest or lowest value, you use the following LIMIT clause:
+
+SELECT select_list
+FROM table_name
+ORDER BY sort_expression
+LIMIT n-1, 1;
+
+The clause LIMIT n-1, 1 returns 1 row starting at the row n.
+
+For example, the following finds the customer who has the second-highest credit:
+
+SELECT 
+    customerName, 
+    creditLimit
+FROM
+    customers
+ORDER BY 
+    creditLimit DESC    
+LIMIT 1,1;
+==============================================================================================================================
+MySQL alias for columns :
+Sometimes, column names are so technical that make the query’s output very difficult to understand. To give a column a descriptive name, you can use a column alias.
+
+The following statement illustrates how to use the column alias:
+
+SELECT 
+   [column_1 | expression] AS descriptive_name
+FROM table_name;
+
+SELECT
+   CONCAT_WS(', ', lastName, firstname) AS `Full name`
+FROM
+   employees;
+   
+In MySQL, you can use the column alias in the ORDER BY, GROUP BY and HAVINGclauses to refer to the column.
+
+The following query uses the column alias in the ORDER BY clause to sort the employee’s full names alphabetically:
+
+SELECT
+	CONCAT_WS(', ', lastName, firstname) `Full name`
+FROM
+	employees
+ORDER BY
+	`Full name`;
+
+The following statement selects the orders whose total amount are greater than 60000. It uses column aliases in GROUP BY and HAVING clauses.
+
+SELECT
+	orderNumber `Order no.`,
+	SUM(priceEach * quantityOrdered) total
+FROM
+	orderDetails
+GROUP BY
+	`Order no.`
+HAVING
+	total > 60000;
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+MySQL alias for tables
+
+You can use an alias to give a table a different name. You assign a table an alias by using the AS keyword as the following syntax:
+
+table_name AS table_alias
+
+The alias for a table is called table alias. Like the column alias, the AS keyword is optional so you can omit it.
+
+This query shows how to assign the employees table alias as e:
+
+SELECT * FROM employees e;
+
+For example:
+
+SELECT 
+    e.firstName, 
+    e.lastName
+FROM
+    employees e
+ORDER BY e.firstName;
+
+The table aliases are often used in the statement that contains INNER JOIN, LEFT JOIN, RIGHT JOIN clauses and in subqueries.
+To avoid this error, you use table alias to qualify the customerNumber column:
+
+SELECT
+	customerName,
+	COUNT(o.orderNumber) total
+FROM
+	customers c
+INNER JOIN orders o ON c.customerNumber = o.customerNumber
+GROUP BY
+	customerName
+ORDER BY
+	total DESC;
+==============================================================================================================================
+Introduction to MySQL join clauses
+
+A relational database consists of multiple related tables linking together using common columns which are known as foreign key 
+columns. Because of this, data in each table is incomplete from the business perspective.
+
+MySQL supports the following types of joins:
+
+    Inner join
+    Left join
+    Right join
+    Cross join
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+MySQL INNER JOIN clause
+
+The inner join clause joins two tables based on a condition which is known as a join predicate.
+
+The inner join clause compares each row from the first table with every row from the second table. If values in both rows cause
+the join condition evaluates to true,
+the inner join clause creates a new row whose column contains all columns of the two rows from both tables and include this
+new row in the final result set.
+In other words, the inner join clause includes only rows whose values match.
+
+The following shows the basic syntax of the inner join clause that joins two tables table_1 and table_2:
+
+SELECT column_list
+FROM table_1
+INNER JOIN table_2 ON join_condition;
+
+If the join condition uses the equal operator (=) and the column names in both tables used for 
+matching are the same, you can use the USING clause instead:
+
+SELECT column_list
+FROM table_1
+INNER JOIN table_2 USING (column_name);
+
+SELECT 
+    m.member_id, 
+    m.name member, 
+    c.committee_id, 
+    c.name committee
+FROM
+    members m
+INNER JOIN committees c 
+	ON c.name = m.name;
+ 
+Ex :  
+FROM
+    orders
+INNER JOIN orderdetails 
+    USING (orderNumber)
+INNER JOIN products 
+    USING (productCode)
+INNER JOIN customers 
+    USING (customerNumber)
+ORDER BY 
+    orderNumber, 
+    orderLineNumber;
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+MySQL LEFT JOIN clause
+
+Similar to an inner join, a left join also requires a join-predicate. When joining two tables using a left join, the concepts of 
+left and right tables are introduced.
+
+The left join selects data starting from the left table. For each row in the left table, the left join compares with every 
+row in the right table. If the values in the
+two rows cause the join condition evaluates to true, the left join creates a new row whose columns contain all columns of 
+the rows in both tables and includes this row in the result set.
+
+SELECT column_list 
+FROM table_1 
+LEFT JOIN table_2 ON join_condition;
+==============================================================================================================================
+Introduction to MySQL GROUP BY clause
+
+The GROUP BY clause groups a set of rows into a set of summary rows by values of columns or expressions. The GROUP BY clause returns one row for each group. In other words, it reduces the number of rows in the result set.
+
+You often use the GROUP BY clause with aggregate functions such as SUM, AVG, MAX, MIN, and COUNT. The aggregate function that appears in the SELECT clause provides information about each group.
+
+The GROUP BY clause is an optional clause of the SELECT statement. The following illustrates the GROUP BY clause syntax:
+
+SELECT 
+    c1, c2,..., cn, aggregate_function(ci)
+FROM
+    table
+WHERE
+    where_conditions
+GROUP BY c1 , c2,...,cn;
+
+FROM  --> WHERE  --> SELECT  -->GROUP BY  -->HAVING  --> ORDER BY  --> "LIMIT"
+
+SELECT 
+    status, 
+    SUM(quantityOrdered * priceEach) AS amount
+FROM
+    orders
+INNER JOIN orderdetails 
+    USING (orderNumber)
+GROUP BY 
+    status;
+==============================================================================================================================    
+Introduction to MySQL HAVING clause
+
+The  HAVING clause is used in the SELECT statement to specify filter conditions for a group of rows or aggregates.
+
+The HAVING clause is often used with the GROUP BY clause to filter groups based on a specified condition. If the GROUP BY clause is omitted, the HAVING clause behaves like the WHERE clause.
+
+The following illustrates the syntax of the HAVING clause:
+
+SELECT 
+    select_list
+FROM 
+    table_name
+WHERE 
+    search_condition
+GROUP BY 
+    group_by_expression
+HAVING 
+    group_condition;
+
+In this syntax, you specify a condition in the HAVING clause. If a row, which is generated by the group by clause, causes the group_condition to evaluate to true, the query will include it in the result set.
+
+Notice that the HAVING clause applies a filter condition to each group of rows, while the WHERE clause applies the filter condition to each individual row.
+
+MySQL evaluates the HAVING clause after the FROM, WHERE, SELECT and GROUP BY clauses and before ORDER BY, and LIMIT clauses.
+
+SELECT 
+    ordernumber,
+    SUM(quantityOrdered) AS itemsCount,
+    SUM(priceeach*quantityOrdered) AS total
+FROM
+    orderdetails
+GROUP BY ordernumber
+HAVING 
+    total > 1000 AND 
+    itemsCount > 600;
+
+SELECT 
+    a.ordernumber, 
+    status, 
+    SUM(priceeach*quantityOrdered) total
+FROM
+    orderdetails a
+INNER JOIN orders b 
+    ON b.ordernumber = a.ordernumber
+GROUP BY  
+    ordernumber, 
+    status
+HAVING 
+    status = 'Shipped' AND 
+    total > 1500;
+==============================================================================================================================    
+ROLLUP :
+The ROLLUP generates multiple grouping sets based on the columns or expression specified in the GROUP BY clause.
+
+See the following query:
+
+SELECT 
+    productLine, 
+    SUM(orderValue) totalOrderValue
+FROM
+    sales
+GROUP BY 
+    productline WITH ROLLUP;
+
+SELECT 
+    productLine, 
+    orderYear,
+    SUM(orderValue) totalOrderValue
+FROM
+    sales
+GROUP BY 
+    productline, 
+    orderYear 
+WITH ROLLUP;
+----------------------------------------------------------------------------------------------------------------------------------
+GROUPING() function
+
+To check whether NULL in the result set represents the subtotals or grand totals, you use the GROUPING() function.
+
+The GROUPING() function returns 1 when NULL occurs in a supper-aggregate row, otherwise, it returns 0.
+
+The GROUPING() function can be used in the select list, HAVING clause, and (as of MySQL 8.0.12 ) ORDER BY clause.
+
+Consider the following query:
+
+SELECT 
+    orderYear,
+    productLine, 
+    SUM(orderValue) totalOrderValue,
+    GROUPING(orderYear),
+    GROUPING(productLine)
+FROM
+    sales
+GROUP BY 
+    orderYear,
+    productline
+WITH ROLLUP;
+
+SELECT 
+    IF(GROUPING(orderYear),
+        'All Years',
+        orderYear) orderYear,
+    IF(GROUPING(productLine),
+        'All Product Lines',
+        productLine) productLine,
+    SUM(orderValue) totalOrderValue
+FROM
+    sales
+GROUP BY 
+    orderYear , 
+    productline 
+WITH ROLLUP;
+==============================================================================================================================
+MySQL Subquery  :
+  A MySQL subquery is a query nested within another query such as SELECT, INSERT, UPDATE or DELETE. In addition, a subquery can be nested inside another subquery.
+
+A MySQL subquery is called an inner query while the query that contains the subquery is called an outer query. A subquery can be used anywhere that expression is used and must be closed in parentheses.
+
+The following query returns employees who work in offices located in the USA.
+
+SELECT 
+    lastName, firstName
+FROM
+    employees
+WHERE
+    officeCode IN (SELECT 
+            officeCode
+        FROM
+            offices
+        WHERE
+            country = 'USA');
+    
+SELECT 
+    customerName
+FROM
+    customers
+WHERE
+    customerNumber NOT IN (SELECT DISTINCT
+            customerNumber
+        FROM
+            orders);    
+-----------------------------------------------------------------------------------------------------------------------------------------------------------    
+MySQL subquery in the FROM clause
+
+When you use a subquery in the FROM clause, the result set returned from a subquery is used as a temporary table. 
+This table is referred to as a derived table or materialized subquery.
+
+The following subquery finds the maximum, minimum and average number of items in sale orders:
+
+SELECT 
+    MAX(items), 
+    MIN(items), 
+    FLOOR(AVG(items))
+FROM
+    (SELECT 
+        orderNumber, COUNT(orderNumber) AS items
+    FROM
+        orderdetails
+    GROUP BY orderNumber) AS lineitems;   
+-----------------------------------------------------------------------------------------------------------------------------------------------------------   
+MySQL subquery with EXISTS and NOT EXISTS
+
+When a subquery is used with the EXISTS or NOT EXISTS operator, a subquery returns a Boolean value of TRUE or FALSE.  The following query illustrates a subquery used with the EXISTS operator:
+
+SELECT 
+    *
+FROM
+    table_name
+WHERE
+    EXISTS( subquery );
+
+In the query above, if the subquery returns any rows, EXISTS subquery returns TRUE, otherwise, it returns FALSE.    
+
+SELECT 
+    customerNumber, 
+    customerName
+FROM
+    customers
+WHERE
+    EXISTS( SELECT 
+            orderNumber, SUM(priceEach * quantityOrdered)
+        FROM
+            orderdetails
+                INNER JOIN
+            orders USING (orderNumber)
+        WHERE
+            customerNumber = customers.customerNumber
+        GROUP BY orderNumber
+        HAVING SUM(priceEach * quantityOrdered) > 60000);
+==============================================================================================================================
+Introduction to MySQL derived table
+
+A derived table is a virtual table returned from a SELECT statement. A derived table is similar to a temporary table, but using
+a derived table in the SELECT statement is much simpler than a temporary table because it does not require steps of creating 
+the temporary table.
+
+The term derived table and subquery is often used interchangeably. When a stand-alone subquery is used in the FROM clause 
+of a SELECT statement, it is called a derived table.
+    
+SELECT 
+    column_list
+FROM
+    (SELECT 
+        column_list
+    FROM
+        table_1) derived_table_name;
+WHERE derived_table_name.c1 > 0;
+
+SELECT 
+    productName, sales
+FROM
+    (SELECT 
+        productCode, 
+        ROUND(SUM(quantityOrdered * priceEach)) sales
+    FROM
+        orderdetails
+    INNER JOIN orders USING (orderNumber)
+    WHERE
+        YEAR(shippedDate) = 2003
+    GROUP BY productCode
+    ORDER BY sales DESC
+    LIMIT 5) top5products2003
+INNER JOIN
+    products USING (productCode);
+
+
+A more complex MySQL derived table example :
+SELECT 
+    customerNumber,
+    ROUND(SUM(quantityOrdered * priceEach)) sales,
+    (CASE
+        WHEN SUM(quantityOrdered * priceEach) < 10000 THEN 'Silver'
+        WHEN SUM(quantityOrdered * priceEach) BETWEEN 10000 AND 100000 THEN 'Gold'
+        WHEN SUM(quantityOrdered * priceEach) > 100000 THEN 'Platinum'
+    END) customerGroup
+FROM
+    orderdetails
+        INNER JOIN
+    orders USING (orderNumber)
+WHERE
+    YEAR(shippedDate) = 2003
+GROUP BY customerNumber;
+
+SELECT 
+    customerGroup, 
+    COUNT(cg.customerGroup) AS groupCount
+FROM
+    (SELECT 
+        customerNumber,
+            ROUND(SUM(quantityOrdered * priceEach)) sales,
+            (CASE
+                WHEN SUM(quantityOrdered * priceEach) < 10000 THEN 'Silver'
+                WHEN SUM(quantityOrdered * priceEach) BETWEEN 10000 AND 100000 THEN 'Gold'
+                WHEN SUM(quantityOrdered * priceEach) > 100000 THEN 'Platinum'
+            END) customerGroup
+    FROM
+        orderdetails
+    INNER JOIN orders USING (orderNumber)
+    WHERE
+        YEAR(shippedDate) = 2003
+    GROUP BY customerNumber) cg
+GROUP BY cg.customerGroup;    
+==============================================================================================================================
+MySQL Window Functions :
+MySQL has supported window functions since version 8.0. The window functions allow you to solve query problems in new, 
+easier ways, and with better performance.
+
+For example, the following query returns the sales for each employee, along with total sales of the employees by fiscal year:
+
+SELECT 
+    fiscal_year, 
+    sales_employee,
+    sale,
+    SUM(sale) OVER (PARTITION BY fiscal_year) total_sales
+FROM
+    sales; 
+In this example, the SUM() function works as a window function which operates on a set of rows defined by the contents of the 
+OVER clause. A set of rows to which the SUM() function applies is referred to as a window.
+
+The SUM() window function reports not only the total sales by fiscal year like it does in the query with the GROUP BY clause,
+but also the result in each row, rather than the total number of rows returned.
+
+Note that window functions are performed on the result set after all JOIN, WHERE, GROUP BY, and HAVING clauses and before 
+the ORDER BY, LIMIT and SELECT DISTINCT.
+MySQL Window Function list :
+Name	Description
+CUME_DIST	     Calculates the cumulative distribution of a value in a set of values.
+DENSE_RANK	   Assigns a rank to every row within its partition based on the ORDER BY clause. It assigns the same rank to the rows with equal values. If two or more rows have the same rank, then there will be no gaps in the sequence of ranked values.
+FIRST_VALUE	   Returns the value of the specified expression with respect to the first row in the window frame.
+LAG	           Returns the value of the Nth row before the current row in a partition. It returns NULL if no preceding row exists.
+LAST_VALUE	   Returns the value of the specified expression with respect to the last row in the window frame.
+LEAD	         Returns the value of the Nth row after the current row in a partition. It returns NULL if no subsequent row exists.
+NTH_VALUE	     Returns value of argument from Nth row of the window frame
+NTILE	         Distributes the rows for each window partition into a specified number of ranked groups.
+PERCENT_RANK	 Calculates the percentile rank of a row in a partition or result set
+RANK	         Similar to the DENSE_RANK() function except that there are gaps in the sequence of ranked values when two or more rows have the same rank.
+ROW_NUMBER	   Assigns a sequential integer to every row within its partition
+
+    
+    
+    
+    
+
+
+
+
+
