@@ -202,13 +202,35 @@ Transformation API differentiation :
     val finalResultProducts = productsGBK.map(product => topNPricedProducts(product._2,1))
 
 Set Operations : 
-      
+union(otherDataset) 	       Return a new dataset that contains the union of the elements in the source dataset and the argument.
+intersection(otherDataset) 	Return a new RDD that contains the intersection of elements in the source dataset and the argument.
+distinct([numPartitions])) 	Return a new dataset that contains the distinct elements of the source dataset.  
 
-          
-          
-          
-          
-          
+val orders = sc.textFile("/user/jagadeeshpamarthi35410/retail_db1/orders/")
+    val orders_2018_08 = orders.filter(order => order.split(",")(1).contains("2018-08")).
+                              map(order => order.split(",")(2))
+    val orders_2018_09 = orders.filter(order => order.split(",")(1).contains("2018-09")).
+                              map(order => order.split(",")(2))
+     val orders_2018_08_intersection_09 =  orders_2018_08.intersection(orders_2018_09)
+     val orders_2018_08_union_09 =  orders_2018_08.union(orders_2018_09).distint
+   
+saveAsTextFile :   
+saveAsTextFile(path) 	Write the elements of the dataset as a text file (or set of text files) in a given directory in the 
+                      local filesystem, HDFS or any other Hadoop-supported file system. 
+                      Spark will call toString on each element to convert it to a line of text in the file.   
+     Syntax :
+        val saveRDD =  orders_2018_08_union_09.saveAsTextFile("/path")   
+  2 types : 
+     val saveRDD =  orders_2018_08_union_09.saveAsTextFile("/path")      
+     val saveRDD =  orders_2018_08_union_09.saveAsTextFile("/path",classOf[org.apache.hadoop.io.compress.snappycodec])     //standard formates  //gZip,Bzip,snappy,defalutCompress etc"     
+
+save in other file formats :
+    val loadDF = sqlContext.load("/path","foramat : jason/paraqute/orc/avro")
+    val readDF = sqlContext.read.json("/path")
+
+    val loadDF = sqlContext.save("/path","foramat : jason/paraqute/orc/avro")
+    val writeDF = sqlContext.wirte.json/orc/paraqute("/path")
+    
 ============================================================================================================================================          
 Excercise 2 :
 
