@@ -209,7 +209,24 @@ Set Operations :
           
           
           
-          
+============================================================================================================================================          
+Excercise 2 :
+
+  val orders = sc.textFile("/user/jagadeeshpamarthi35410/retail_db1/orders/")
+  val ordersFilter = orders.filter(order => (order.split(",")(3) == "COMPLETE" || order.split(",")(3) == "CLOSED"))
+  val ordersMap = ordersFilter.map(order => (order.split(",")(0).toInt, order.split(",")(1)))
+  val order_items = sc.textFile("/user/jagadeeshpamarthi35410/retail_db1/order_items/")
+  val oiMap = order_items.map(oi => (oi.split(",")(1).toInt,(oi.split(",")(2).toInt,oi.split(",")(4).toFloat)))
+  val omJoinOim = ordersMap.join(oiMap)
+  val dailyRevenuePerProduct = omJoinOim.map(o => ((o._2._1,o._2._2._1),o._2._2._2)).reduceByKey((r,t)=>r+t)
+  val omJoinOimMap = dailyRevenuePerProduct.map(o => (o._1._2,(o._1._1,o._2)))
+  val product = sc.textFile("/user/jagadeeshpamarthi35410/retail_db1/product/")
+  val pMap = product.map(p => (p.split(",")(0).toInt,p.split(",")(2)))
+  val omJoinOimMapJoinpMap = omJoinOimMap.join(pMap)
+  val finalMap = omJoinOimMapJoinpMap.map(op => ((op._2._1._1,op._2._1._2),op._2._2))
+  val finalMapSorted = finalMap.map(f => ((f._1._1,-f._1._2),f)).sortByKey()
+  val finalResult = finalMapSorted.map(f => f._2._1._1+","+f._2._1._2+","+f._2._2)
+  val saveexcercise2 = finalResult.saveAsTextFile("/user/jagadeeshpamarthi35410/Excercise2_Result")
 
 
     
