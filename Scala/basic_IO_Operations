@@ -1,6 +1,6 @@
 In scala we can access local files with the help of API scala.io.Source
 scala.io.Source
-val data = Source.fromFile("Downloads/names/yob1881.txt").getLines        // .getLines method helps us to get the data as whole line instead of single char
+val data = Source.fromFile("Downloads/names/yob1881.txt").getLines.toList        // .getLines method helps us to get the data as whole line instead of single char
 
 MapReduce using this data :
 val dataFilter = data.filter(dataCont => dataCont.split(",")(1).equals("M"))     //boolean values as output of fun and final output is list:Int
