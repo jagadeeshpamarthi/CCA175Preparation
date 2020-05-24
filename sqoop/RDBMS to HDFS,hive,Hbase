@@ -1,0 +1,82 @@
+Sqoop (SQL-to-Hadoop) is a big data tool that offers the capability to extract data from non-Hadoop data stores(RDBMS), transform the data into a form usable by Hadoop, and then load the data into HDFS. This process is called ETL, for Extract, Transform, and Load.
+
+Sqoop is one of the methods to ingest data into HDFS(Hadoop Distributed File System). It plays a key role in importing structured data into HDFS/Hive/HBase.
+No alt text provided for this image
+
+Sqoop commands can be divided into :
+
+a. Sqoop import (hdfs/hive/hbase incremental)
+
+b. Sqoop export ( transferring data from hdfs to RDBMS)
+
+c. Sqoop Job
+Sqoop Import :
+
+i. Normal Sqoop import command :
+
+sqoop import-all-tables --connect jdbc:mysql:///<HostName>/retail_db --username sqoopuser --password-file file:///home/jagadeeshp/password_file
+
+The above command will import-all-tables --> all tables under that particular database will be imported connect --> connect to the database table-name --> table in that database username & password --> mysql username in order to connect will generate a file with same name of table in HDFS home directory which contains the data of the employee table
+No alt text provided for this image
+
+Sqoop import/export commands executed with hadoop map reduce job but there won't be any reducer task running as there is no need to perform any aggregations. By default 4 map jobs run and can be changed manually providing number of mappers required -m 10.
+No alt text provided for this image
+
+ii. Sqoop Incremental import :
+
+sqoop import --connect jdbc:mysql:///<hostname >/retail_db --table employee --username sqoopuser --password-file file:///home/jagadeeshp/password_file --incremental append --check-column emp_id --last-value 0 --m 1 --target-dir /user/jagadeeshp/emp
+
+incremental --> defines the command to update the table when their are updates append --> will append the updated values into the file/table check-column --> column name which has unique auto increment values, to be specified last-value --> checks the last value of above mentioned column and update if any new . values are added
+
+iii. Hive table import :
+
+sqoop import \ --connect jdbc:mysql://<hostname>/retail_db \ --table student \ --username sqoopuser \ --password-file file:///home/jagadeeshp/password_file \ --incremental append \ --check-column student_id \ --last-value 0 \ --hive-import \ --create-hive-table --fields-terminated-by "," \ --hive-table jagadeeshp.student --m 1
+
+fields-terminated-by – I have specified comma (as by default it will import data into HDFS with comma-separated values) hive-import – Import table into Hive (Uses Hive’s default delimiters if none are set.) create-hive-table – Determines if set job will fail if a Hive table already exists. It works in this case. hive-table – Specifies <db_name>.<table_name>. Here it's sqoop_workspace.customers, where sqoop_workspace is my database and customers is the table name.
+
+iv. HBase import :
+
+sqoop import \> --connect jdbc:mysql://hostname/mydb \> --username vithal -P \> --table SAMPLE_TEST \> --columns "ROW_KEY,LOCATION" \> --hbase-table sample_test \> --column-family name \> --hbase-row-key ROW_KEY -m 1
+
+Sqoop Job :
+
+Sqoop Job allows us to create and work with saved jobs in sqoop.
+
+–create Defines a new job with the specified job-id (name). Actual Sqoop import . command should be separated by “–“ –delete Delete a saved job. –exec Executes the saved job. –show Show the save job configuration –list Lists all the saved jobs
+No alt text provided for this image
+
+Once the above command is executed using sqoop job -exec sqoopjob2 then the upper-bond (last value ) is updated in sqoop metastore which helps us in not update the value manually.
+No alt text provided for this image
+
+
+No alt text provided for this image
+
+
+Now we shall update value in student table in MySql and shall execute the above sqoop job
+
+
+
+
+
+Once again we shall run command sqoop job -exec sqoopjob2
+Auto saved lower-bound value(6)
+updated only one field (7)
+Sqoop Export :
+
+exports a set of files from HDFS back to RDBMS.There is one condition for it, that in the database, target the table must already exist.
+
+$ sqoop export --connect jdbc:mysql://localhost/db --username root --table employee --export-dir /emp/emp_data
+
+Sqoop export Hive to Mysql :
+
+sqoop export --connect jdbc:mysql://<hostName>/sqoopex -m 1 --table sales_sgiri --export-dir /apps/hive/warehouse/sg.db/sales_test --input-fields-terminated-by ',' --username sqoopuser --P
+
+Key points to note :
+
+    Sqoop metastore plays key role during auto increment sqoop job to store last value. And Sqoop job don't allow password written in the command due to security reasons as the jobs are visible to all users. So password can be provided during execution or in passing file(best practice).
+    --direct command is more efficient, compared to jdbc import
+    --codegen command generates the java code, getter setter class and jar file for particular command
+    Sqoop tool helps in importing/exporting tables from RDBMS <==> HDFS/Hive/HBase
+    sqoop-site.xml for sqoop related configurations
+    Sqoop also support 3rd party RDBMS like TeraData by adding external jars
+
